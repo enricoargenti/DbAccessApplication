@@ -16,11 +16,12 @@ public class SqlDataAccess : IDataAccess
     public async Task<IEnumerable<OpenDoorRequest>> GetOpenDoorRequestsAsync()
     {
         const string query = @"
-            SELECT [Id]
-                  ,[Name]
-                  ,[Description]
-                  ,[Price]
-              FROM [dbo].[Products]
+            SELECT [DoorId]
+                   ,[GatewayId]
+                   ,[DeviceGeneratedCode]
+                   ,[CloudGeneratedCode]
+                   ,[AccessRequestTime]
+              FROM [dbo].[OpenDoorRequests]
             ";
         using var connection = new SqlConnection(_connectionString);
         return await connection.QueryAsync<OpenDoorRequest>(query);
@@ -29,11 +30,12 @@ public class SqlDataAccess : IDataAccess
     public async Task<OpenDoorRequest> GetOpenDoorRequestAsync(int id)
     {
         const string query = @"
-            SELECT [Id]
-                  ,[Name]
-                  ,[Description]
-                  ,[Price]
-              FROM [dbo].[Products]
+            SELECT [DoorId]
+                   ,[GatewayId]
+                   ,[DeviceGeneratedCode]
+                   ,[CloudGeneratedCode]
+                   ,[AccessRequestTime]
+              FROM [dbo].[OpenDoorRequests]
               WHERE Id = @id
             ";
         using var connection = new SqlConnection(_connectionString);
@@ -41,17 +43,22 @@ public class SqlDataAccess : IDataAccess
         return await connection.QueryFirstOrDefaultAsync<OpenDoorRequest>(query, new { id });
     }
 
+    // Insert  into the db an open door request
     public async Task InsertOpenDoorRequestAsync(OpenDoorRequest product)
     {
         const string query = @"
-            INSERT INTO [dbo].[Products]
-                       ([Name]
-                       ,[Description]
-                       ,[Price])
+            INSERT INTO [dbo].[OpenDoorRequests]
+                       ([DoorId]
+                       ,[GatewayId]
+                       ,[DeviceGeneratedCode]
+                       ,[CloudGeneratedCode]
+                       ,[AccessRequestTime])
                  VALUES
-                       (@Name
-                       ,@Description
-                       ,@Price)
+                       (@DoorId
+                       ,@GatewayId
+                       ,@DeviceGeneratedCode
+                       ,@CloudGeneratedCode
+                       ,@AccessRequestTime)
             ";
         using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
