@@ -1,6 +1,7 @@
 ﻿using DbAccessApplication.Models;
 using Microsoft.Data.SqlClient;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DbAccessApplication.Services;
 
@@ -13,10 +14,12 @@ public class SqlDataAccess : IDataAccess
         _connectionString = configuration.GetConnectionString("AzureDb");
     }
 
+    // GET: Ask the db for every open door request
     public async Task<IEnumerable<OpenDoorRequest>> GetOpenDoorRequestsAsync()
     {
         const string query = @"
-            SELECT [DoorId]
+            SELECT [Id]
+                   ,[DoorId]
                    ,[GatewayId]
                    ,[DeviceGeneratedCode]
                    ,[CloudGeneratedCode]
@@ -27,10 +30,12 @@ public class SqlDataAccess : IDataAccess
         return await connection.QueryAsync<OpenDoorRequest>(query);
     }
 
+    //GET: Ask the db for a particular open door request
     public async Task<OpenDoorRequest> GetOpenDoorRequestAsync(int id)
     {
         const string query = @"
-            SELECT [DoorId]
+            SELECT [Id]
+                   ,[DoorId]
                    ,[GatewayId]
                    ,[DeviceGeneratedCode]
                    ,[CloudGeneratedCode]
@@ -43,7 +48,7 @@ public class SqlDataAccess : IDataAccess
         return await connection.QueryFirstOrDefaultAsync<OpenDoorRequest>(query, new { id });
     }
 
-    // Insert  into the db an open door request
+    // POST: Insert into the db an open door request
     public async Task InsertOpenDoorRequestAsync(OpenDoorRequest product)
     {
         const string query = @"
@@ -64,4 +69,28 @@ public class SqlDataAccess : IDataAccess
         await connection.OpenAsync();
         await connection.ExecuteAsync(query, product);
     }
+
+    //PUT: Modify a particular open door request
+    public async Task UpdateOpenDoorRequestAsync(int id, OpenDoorRequest updatedRequest)
+    {
+        const string query = @"
+            UPDATE [dbo].[OpenDoorRequests]
+            SET [DoorId] = @DoorId,
+                [GatewayId] = @GatewayId,
+                [DeviceGeneratedCode] = @DeviceGeneratedCode,
+                [CloudGeneratedCode] = @CloudGeneratedCode,
+                [AccessRequestTime] = @AccessRequestTime
+            WHERE Id = @Id
+        ";
+
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        updatedRequest.Id = id; // Set the ID of the updated request
+
+        await connection.ExecuteAsync(query, updatedRequest);
+    }
+
+
+
 }

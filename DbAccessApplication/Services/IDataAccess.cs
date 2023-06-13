@@ -9,5 +9,11 @@ namespace DbAccessApplication.Services
         Task<OpenDoorRequest> GetOpenDoorRequestAsync(int id);
 
         Task InsertOpenDoorRequestAsync(OpenDoorRequest openDoorRequest);
+
+        Task UpdateOpenDoorRequestAsync(int id, OpenDoorRequest updatedRequest);
+
+
+        //Task DeleteOpenDoorRequestAsync(int id);
+
     }
 }
