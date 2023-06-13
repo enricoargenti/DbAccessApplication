@@ -91,6 +91,20 @@ public class SqlDataAccess : IDataAccess
         await connection.ExecuteAsync(query, updatedRequest);
     }
 
+    //DELETE: Ask the db for a particular open door request
+    public async Task DeleteOpenDoorRequestAsync(int id)
+    {
+        const string query = @"
+            DELETE FROM [dbo].[OpenDoorRequests]
+              WHERE Id = @id
+            ";
+
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        await connection.ExecuteAsync(query, new { Id = id });
+    }
+
 
 
 }

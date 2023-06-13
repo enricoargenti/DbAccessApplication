@@ -12,8 +12,7 @@ namespace DbAccessApplication.Services
 
         Task UpdateOpenDoorRequestAsync(int id, OpenDoorRequest updatedRequest);
 
-
-        //Task DeleteOpenDoorRequestAsync(int id);
+        Task DeleteOpenDoorRequestAsync(int id);
 
     }
 }
