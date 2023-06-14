@@ -21,11 +21,20 @@ public class DoorOpenRequestController : Controller
         return _dataAccess.GetOpenDoorRequestsAsync();
     }
 
+    
     [HttpGet("{id}")] // GET api/opendoorrequests/{id}
     public Task<OpenDoorRequest> GetById(int id)
     {
         return _dataAccess.GetOpenDoorRequestAsync(id);
     }
+    
+    
+    [HttpGet("deviceGeneratedCode/{code}")] // GET api/opendoorrequests/{code}
+    public Task<OpenDoorRequest> GetWhereCodeMatches(int code)
+    {
+        return _dataAccess.GetOpenDoorRequestWhereCodeIsMatchedAsync(code);
+    }
+    
 
     [HttpPost] // POST api/opendoorrequests
     public Task Insert(OpenDoorRequest openDoorRequest)

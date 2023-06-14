@@ -48,6 +48,26 @@ public class SqlDataAccess : IDataAccess
         return await connection.QueryFirstOrDefaultAsync<OpenDoorRequest>(query, new { id });
     }
 
+    //GET: Ask the db for the open door request where the deviceGeneratedCode
+    //is equal to the one inserted by the user
+    public async Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(int code)
+    {
+        const string query = @"
+            SELECT [Id]
+                   ,[DoorId]
+                   ,[GatewayId]
+                   ,[DeviceGeneratedCode]
+                   ,[CloudGeneratedCode]
+                   ,[AccessRequestTime]
+              FROM [dbo].[OpenDoorRequests]
+              WHERE DeviceGeneratedCode = @code
+            ";
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        return await connection.QueryFirstOrDefaultAsync<OpenDoorRequest>(query, new {code});
+    }
+    
+
     // POST: Insert into the db an open door request
     public async Task InsertOpenDoorRequestAsync(OpenDoorRequest product)
     {
