@@ -18,14 +18,16 @@ public class SqlDataAccess : IDataAccess
     public async Task<IEnumerable<OpenDoorRequest>> GetOpenDoorRequestsAsync()
     {
         const string query = @"
-            SELECT [Id]
-                   ,[DoorId]
-                   ,[GatewayId]
-                   ,[DeviceGeneratedCode]
-                   ,[CloudGeneratedCode]
-                   ,[AccessRequestTime]
-              FROM [dbo].[OpenDoorRequests]
-            ";
+            SELECT [OpenDoorRequests].[Id]
+                ,[OpenDoorRequests].[DoorId]
+                ,[Gateways].[DeviceId]
+                ,[OpenDoorRequests].[DeviceGeneratedCode]
+                ,[OpenDoorRequests].[CloudGeneratedCode]
+                ,[OpenDoorRequests].[AccessRequestTime]
+            FROM [dbo].[OpenDoorRequests]
+            JOIN [dbo].[Gateways]
+            ON [Gateways].[Id] = [OpenDoorRequests].[GatewayId]
+        ";
         using var connection = new SqlConnection(_connectionString);
         return await connection.QueryAsync<OpenDoorRequest>(query);
     }
@@ -34,15 +36,17 @@ public class SqlDataAccess : IDataAccess
     public async Task<OpenDoorRequest> GetOpenDoorRequestAsync(int id)
     {
         const string query = @"
-            SELECT [Id]
-                   ,[DoorId]
-                   ,[GatewayId]
-                   ,[DeviceGeneratedCode]
-                   ,[CloudGeneratedCode]
-                   ,[AccessRequestTime]
-              FROM [dbo].[OpenDoorRequests]
-              WHERE Id = @id
-            ";
+            SELECT [OpenDoorRequests].[Id]
+                ,[OpenDoorRequests].[DoorId]
+                ,[Gateways].[DeviceId]
+                ,[OpenDoorRequests].[DeviceGeneratedCode]
+                ,[OpenDoorRequests].[CloudGeneratedCode]
+                ,[OpenDoorRequests].[AccessRequestTime]
+            FROM [dbo].[OpenDoorRequests]
+            JOIN [dbo].[Gateways]
+            ON [Gateways].[Id] = [OpenDoorRequests].[GatewayId]
+            WHERE [OpenDoorRequests].[Id] = @id
+        ";
         using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         return await connection.QueryFirstOrDefaultAsync<OpenDoorRequest>(query, new { id });
@@ -53,15 +57,17 @@ public class SqlDataAccess : IDataAccess
     public async Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(int code)
     {
         const string query = @"
-            SELECT [Id]
-                   ,[DoorId]
-                   ,[GatewayId]
-                   ,[DeviceGeneratedCode]
-                   ,[CloudGeneratedCode]
-                   ,[AccessRequestTime]
-              FROM [dbo].[OpenDoorRequests]
-              WHERE DeviceGeneratedCode = @code
-            ";
+            SELECT [OpenDoorRequests].[Id]
+                ,[OpenDoorRequests].[DoorId]
+                ,[Gateways].[DeviceId]
+                ,[OpenDoorRequests].[DeviceGeneratedCode]
+                ,[OpenDoorRequests].[CloudGeneratedCode]
+                ,[OpenDoorRequests].[AccessRequestTime]
+            FROM [dbo].[OpenDoorRequests]
+            JOIN [dbo].[Gateways] 
+            ON [Gateways].[Id] = [OpenDoorRequests].[GatewayId]
+            WHERE [OpenDoorRequests].[DeviceGeneratedCode] = @code
+        ";
         using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         return await connection.QueryFirstOrDefaultAsync<OpenDoorRequest>(query, new {code});
@@ -73,18 +79,22 @@ public class SqlDataAccess : IDataAccess
     {
         const string query = @"
             INSERT INTO [dbo].[OpenDoorRequests]
-                       ([DoorId]
-                       ,[GatewayId]
-                       ,[DeviceGeneratedCode]
-                       ,[CloudGeneratedCode]
-                       ,[AccessRequestTime])
-                 VALUES
-                       (@DoorId
-                       ,@GatewayId
-                       ,@DeviceGeneratedCode
-                       ,@CloudGeneratedCode
-                       ,@AccessRequestTime)
-            ";
+                ([DoorId]
+                ,[GatewayId]
+                ,[DeviceGeneratedCode]
+                ,[CloudGeneratedCode]
+                ,[AccessRequestTime])
+            SELECT
+                @DoorId,
+                [Gateways].[Id],
+                @DeviceGeneratedCode,
+                @CloudGeneratedCode,
+                @AccessRequestTime
+            FROM
+                [dbo].[Gateways]
+            WHERE
+                [Gateways].[DeviceId] = @DeviceId
+        ";
         using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
         await connection.ExecuteAsync(query, product);
@@ -96,11 +106,14 @@ public class SqlDataAccess : IDataAccess
         const string query = @"
             UPDATE [dbo].[OpenDoorRequests]
             SET [DoorId] = @DoorId,
-                [GatewayId] = @GatewayId,
+                [GatewayId] = [Gateways].[Id],
                 [DeviceGeneratedCode] = @DeviceGeneratedCode,
                 [CloudGeneratedCode] = @CloudGeneratedCode,
                 [AccessRequestTime] = @AccessRequestTime
-            WHERE Id = @Id
+            FROM [dbo].[OpenDoorRequests]
+            JOIN [dbo].[Gateways] 
+            ON [Gateways].[DeviceId] = @DeviceId
+            WHERE [OpenDoorRequests].[Id] = @Id
         ";
 
         using var connection = new SqlConnection(_connectionString);
@@ -116,8 +129,8 @@ public class SqlDataAccess : IDataAccess
     {
         const string query = @"
             DELETE FROM [dbo].[OpenDoorRequests]
-              WHERE Id = @id
-            ";
+              WHERE [OpenDoorRequests].[Id] = @id
+        ";
 
         using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
