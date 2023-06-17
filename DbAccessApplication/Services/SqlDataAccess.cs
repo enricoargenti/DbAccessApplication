@@ -54,7 +54,7 @@ public class SqlDataAccess : IDataAccess
 
     //GET: Ask the db for the open door request where the deviceGeneratedCode
     //is equal to the one inserted by the user
-    public async Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(int code)
+    public async Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(string code)
     {
         const string query = @"
             SELECT [OpenDoorRequests].[Id]

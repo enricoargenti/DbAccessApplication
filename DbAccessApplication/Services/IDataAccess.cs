@@ -8,7 +8,7 @@ namespace DbAccessApplication.Services
 
         Task<OpenDoorRequest> GetOpenDoorRequestAsync(int id);
 
-        Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(int code);
+        Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(string code);
 
         Task InsertOpenDoorRequestAsync(OpenDoorRequest openDoorRequest);
 

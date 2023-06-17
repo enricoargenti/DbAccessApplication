@@ -30,7 +30,7 @@ public class DoorOpenRequestController : Controller
     
     
     [HttpGet("deviceGeneratedCode/{code}")] // GET api/opendoorrequests/{code}
-    public Task<OpenDoorRequest> GetWhereCodeMatches(int code)
+    public Task<OpenDoorRequest> GetWhereCodeMatches(string code)
     {
         return _dataAccess.GetOpenDoorRequestWhereCodeIsMatchedAsync(code);
     }
