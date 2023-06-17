@@ -10,6 +10,8 @@ namespace DbAccessApplication.Services
 
         Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(string code);
 
+        Task<UserPermissions> GetUserPermissionsAsync(string userId, string deviceId);
+
         Task InsertOpenDoorRequestAsync(OpenDoorRequest openDoorRequest);
 
         Task UpdateOpenDoorRequestAsync(int id, OpenDoorRequest updatedRequest);

@@ -34,7 +34,13 @@ public class DoorOpenRequestController : Controller
     {
         return _dataAccess.GetOpenDoorRequestWhereCodeIsMatchedAsync(code);
     }
-    
+
+    [HttpGet("user/{userId}/deviceId/{deviceId}")] // GET api/opendoorrequests/userPermissions
+    public Task<UserPermissions> GetUserPermissions(string userId, string deviceId)
+    {
+        return _dataAccess.GetUserPermissionsAsync(userId, deviceId);
+    }
+
 
     [HttpPost] // POST api/opendoorrequests
     public Task Insert(OpenDoorRequest openDoorRequest)
@@ -48,7 +54,7 @@ public class DoorOpenRequestController : Controller
         return _dataAccess.UpdateOpenDoorRequestAsync(id, openDoorRequest);
     }
 
-    [HttpDelete] // DELETE api/opendoorrequests/{id}
+    [HttpDelete("{id}")] // DELETE api/opendoorrequests/{id}
     public Task Delete(int id)
     {
         return _dataAccess.DeleteOpenDoorRequestAsync(id);

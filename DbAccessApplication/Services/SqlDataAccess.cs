@@ -72,7 +72,27 @@ public class SqlDataAccess : IDataAccess
         await connection.OpenAsync();
         return await connection.QueryFirstOrDefaultAsync<OpenDoorRequest>(query, new {code});
     }
-    
+
+    //GET: Ask the db for the user permission to access the specific gateway/building
+    public async Task<UserPermissions> GetUserPermissionsAsync(string userId, string deviceId)
+    {
+        const string query = @"
+            SELECT [AspNetUsers].[UserName]
+                ,[AspNetUsers].[Id] AS [UserId] 
+                ,[Gateways].[DeviceId]
+            FROM [AspNetUsers]
+            JOIN [UsersGateways]
+            ON [AspNetUsers].[Id] = [UsersGateways].[UserId]
+            JOIN [Gateways]
+            ON [Gateways].[Id] = [UsersGateways].[GatewayId]
+            WHERE [AspNetUsers].[Id] = @userId
+            AND [Gateways].[DeviceId] = @deviceId
+        ";
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        return await connection.QueryFirstOrDefaultAsync<UserPermissions>(query, new { userId, deviceId });
+    }
+
 
     // POST: Insert into the db an open door request
     public async Task InsertOpenDoorRequestAsync(OpenDoorRequest product)
