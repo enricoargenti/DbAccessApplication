@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace DbAccessApplication.Services;
 
@@ -23,7 +24,9 @@ public class SqlDataAccess : IDataAccess
                 ,[Gateways].[DeviceId]
                 ,[OpenDoorRequests].[DeviceGeneratedCode]
                 ,[OpenDoorRequests].[CloudGeneratedCode]
+                ,[OpenDoorRequests].[CodeInsertedOnDoorByUser]
                 ,[OpenDoorRequests].[AccessRequestTime]
+                ,[OpenDoorRequests].[UserId]
             FROM [dbo].[OpenDoorRequests]
             JOIN [dbo].[Gateways]
             ON [Gateways].[Id] = [OpenDoorRequests].[GatewayId]
@@ -41,7 +44,9 @@ public class SqlDataAccess : IDataAccess
                 ,[Gateways].[DeviceId]
                 ,[OpenDoorRequests].[DeviceGeneratedCode]
                 ,[OpenDoorRequests].[CloudGeneratedCode]
+                ,[OpenDoorRequests].[CodeInsertedOnDoorByUser]
                 ,[OpenDoorRequests].[AccessRequestTime]
+                ,[OpenDoorRequests].[UserId]
             FROM [dbo].[OpenDoorRequests]
             JOIN [dbo].[Gateways]
             ON [Gateways].[Id] = [OpenDoorRequests].[GatewayId]
@@ -62,7 +67,9 @@ public class SqlDataAccess : IDataAccess
                 ,[Gateways].[DeviceId]
                 ,[OpenDoorRequests].[DeviceGeneratedCode]
                 ,[OpenDoorRequests].[CloudGeneratedCode]
+                ,[OpenDoorRequests].[CodeInsertedOnDoorByUser]
                 ,[OpenDoorRequests].[AccessRequestTime]
+                ,[OpenDoorRequests].[UserId]
             FROM [dbo].[OpenDoorRequests]
             JOIN [dbo].[Gateways] 
             ON [Gateways].[Id] = [OpenDoorRequests].[GatewayId]
@@ -123,13 +130,17 @@ public class SqlDataAccess : IDataAccess
     //PUT: Modify a particular open door request
     public async Task UpdateOpenDoorRequestAsync(int id, OpenDoorRequest updatedRequest)
     {
+        Console.WriteLine("Id: " + id);
+        Console.WriteLine("updatedRequest: " + updatedRequest.UserId);
         const string query = @"
             UPDATE [dbo].[OpenDoorRequests]
             SET [DoorId] = @DoorId,
                 [GatewayId] = [Gateways].[Id],
                 [DeviceGeneratedCode] = @DeviceGeneratedCode,
                 [CloudGeneratedCode] = @CloudGeneratedCode,
-                [AccessRequestTime] = @AccessRequestTime
+                [CodeInsertedOnDoorByUser] = @CodeInsertedOnDoorByUser,
+                [AccessRequestTime] = @AccessRequestTime,
+                [UserId] = @UserId
             FROM [dbo].[OpenDoorRequests]
             JOIN [dbo].[Gateways] 
             ON [Gateways].[DeviceId] = @DeviceId
@@ -144,12 +155,64 @@ public class SqlDataAccess : IDataAccess
         await connection.ExecuteAsync(query, updatedRequest);
     }
 
+    //PATCH
+
+    /*
+    public async Task PatchOpenDoorRequestAsync(int id, JsonPatchDocument<OpenDoorRequest> patchDocument)
+    {
+        const string query = @"
+            UPDATE [dbo].[OpenDoorRequests]
+            SET [DoorId] = @DoorId,
+                [GatewayId] = [Gateways].[Id],
+                [DeviceGeneratedCode] = @DeviceGeneratedCode,
+                [CloudGeneratedCode] = @CloudGeneratedCode,
+                [OpenDoorRequests].[CodeInsertedOnDoorByUser],
+                [AccessRequestTime] = @AccessRequestTime,
+                [UserId] = @UserId
+            FROM [dbo].[OpenDoorRequests]
+            JOIN [dbo].[Gateways] 
+            ON [Gateways].[DeviceId] = @DeviceId
+            WHERE [OpenDoorRequests].[Id] = @Id
+        ";
+
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        var existingRequest = await connection.QuerySingleOrDefaultAsync<OpenDoorRequest>(
+            "SELECT * FROM [dbo].[OpenDoorRequests] WHERE [Id] = @Id", new { Id = id });
+
+        if (existingRequest == null)
+        {
+            // Handle not found error
+            return;
+        }
+
+        var updatedRequest = new OpenDoorRequest();
+        patchDocument.ApplyTo(updatedRequest); // Apply the patch to the updatedRequest
+
+        // Update only the properties that were modified
+        if (patchDocument.Operations.Any())
+        {
+            // Update the properties of the existing request with the patched values
+            existingRequest.DoorId = updatedRequest.DoorId ?? existingRequest.DoorId;
+            existingRequest.GatewayId = updatedRequest.GatewayId ?? existingRequest.GatewayId;
+            existingRequest.DeviceGeneratedCode = updatedRequest.DeviceGeneratedCode ?? existingRequest.DeviceGeneratedCode;
+            existingRequest.CloudGeneratedCode = updatedRequest.CloudGeneratedCode ?? existingRequest.CloudGeneratedCode;
+            existingRequest.AccessRequestTime = updatedRequest.AccessRequestTime ?? existingRequest.AccessRequestTime;
+            existingRequest.UserId = updatedRequest.UserId ?? existingRequest.UserId;
+        }
+
+        await connection.ExecuteAsync(query, existingRequest);
+    }
+    */
+
+
     //DELETE: Ask the db for a particular open door request
     public async Task DeleteOpenDoorRequestAsync(int id)
     {
         const string query = @"
             DELETE FROM [dbo].[OpenDoorRequests]
-              WHERE [OpenDoorRequests].[Id] = @id
+                WHERE [OpenDoorRequests].[Id] = @id
         ";
 
         using var connection = new SqlConnection(_connectionString);

@@ -48,7 +48,7 @@ public class DoorOpenRequestController : Controller
         return _dataAccess.InsertOpenDoorRequestAsync(openDoorRequest);
     }
 
-    [HttpPut] // PUT api/opendoorrequests/{id}
+    [HttpPut("{id}")] // PUT api/opendoorrequests/{id}
     public Task Update(int id, OpenDoorRequest openDoorRequest)
     {
         return _dataAccess.UpdateOpenDoorRequestAsync(id, openDoorRequest);
