@@ -59,4 +59,10 @@ public class DoorOpenRequestController : Controller
     {
         return _dataAccess.DeleteOpenDoorRequestAsync(id);
     }
+
+    [HttpDelete("minutes/{minutes}")] // DELETE api/opendoorrequests/minutes/{minutes}
+    public Task DeleteWhereTimeIsExpired(int minutes)
+    {
+        return _dataAccess.DeleteOpenDoorRequestsAsync(minutes);
+    }
 }
