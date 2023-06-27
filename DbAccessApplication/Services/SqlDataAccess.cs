@@ -35,6 +35,28 @@ public class SqlDataAccess : IDataAccess
         return await connection.QueryAsync<OpenDoorRequest>(query);
     }
 
+    // GET: Ask the db for every access saved
+    public async Task<IEnumerable<AccessExtended>> GetAccessesAsync()
+    {
+        const string query = @"
+            SELECT [AspNetUsers].[UserName]
+                ,[Accesses].[DoorId]
+                ,[Gateways].[DeviceId]
+                ,[Buildings].[Name] AS BuildingName
+                ,[Buildings].[Description] AS BuildingDescription
+                ,[Accesses].[AccessRequestTime]
+            FROM [dbo].[Accesses]
+            JOIN [dbo].[Gateways]
+            ON [Gateways].[Id] = [Accesses].[GatewayId]
+            JOIN [dbo].[Buildings]
+            ON [Gateways].[BuildingId] = [Buildings].[Id]
+            JOIN [dbo].[AspNetUsers]
+            ON [Accesses].[UserId] = [AspNetUsers].[Id]
+        ";
+        using var connection = new SqlConnection(_connectionString);
+        return await connection.QueryAsync<AccessExtended>(query);
+    }
+
     //GET: Ask the db for a particular open door request
     public async Task<OpenDoorRequest> GetOpenDoorRequestAsync(int id)
     {
@@ -102,7 +124,7 @@ public class SqlDataAccess : IDataAccess
 
 
     // POST: Insert into the db an open door request
-    public async Task InsertOpenDoorRequestAsync(OpenDoorRequest product)
+    public async Task InsertOpenDoorRequestAsync(OpenDoorRequest openDoorRequest)
     {
         const string query = @"
             INSERT INTO [dbo].[OpenDoorRequests]
@@ -124,7 +146,31 @@ public class SqlDataAccess : IDataAccess
         ";
         using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
-        await connection.ExecuteAsync(query, product);
+        await connection.ExecuteAsync(query, openDoorRequest);
+    }
+
+    // POST: Insert into the db a new access
+    public async Task InsertNewAccessAsync(Access access)
+    {
+        const string query = @"
+            INSERT INTO [dbo].[Accesses]
+                ([UserId]
+                ,[DoorId]
+                ,[GatewayId]
+                ,[AccessRequestTime])
+            SELECT
+                @UserId,
+                @DoorId,
+                [Gateways].[Id],
+                @AccessRequestTime
+            FROM
+                [dbo].[Gateways]
+            WHERE
+                [Gateways].[DeviceId] = @DeviceId
+        ";
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        await connection.ExecuteAsync(query, access);
     }
 
     //PUT: Modify a particular open door request
@@ -176,6 +222,7 @@ public class SqlDataAccess : IDataAccess
     {
         DateTime minutesAgo = DateTime.Now.AddMinutes(-minutes);
         Console.WriteLine("Effettivamente qui la cancellazione avviene");
+
 
         const string query = @"
             DELETE FROM [dbo].[OpenDoorRequests]

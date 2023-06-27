@@ -6,6 +6,8 @@ namespace DbAccessApplication.Services
     {
         Task<IEnumerable<OpenDoorRequest>> GetOpenDoorRequestsAsync();
 
+        Task<IEnumerable<AccessExtended>> GetAccessesAsync();
+
         Task<OpenDoorRequest> GetOpenDoorRequestAsync(int id);
 
         Task<OpenDoorRequest> GetOpenDoorRequestWhereCodeIsMatchedAsync(string code);
@@ -13,6 +15,8 @@ namespace DbAccessApplication.Services
         Task<UserPermissions> GetUserPermissionsAsync(string userId, string deviceId);
 
         Task InsertOpenDoorRequestAsync(OpenDoorRequest openDoorRequest);
+
+        Task InsertNewAccessAsync(Access access);
 
         Task UpdateOpenDoorRequestAsync(int id, OpenDoorRequest updatedRequest);
 

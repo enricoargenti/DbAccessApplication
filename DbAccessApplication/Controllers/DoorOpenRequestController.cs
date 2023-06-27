@@ -21,7 +21,13 @@ public class DoorOpenRequestController : Controller
         return _dataAccess.GetOpenDoorRequestsAsync();
     }
 
-    
+    [HttpGet("accesses")] // GET api/doorOpenRequest/accesses
+    public Task<IEnumerable<AccessExtended>> GetAllAccesses()
+    {
+        return _dataAccess.GetAccessesAsync();
+    }
+
+
     [HttpGet("{id}")] // GET api/opendoorrequests/{id}
     public Task<OpenDoorRequest> GetById(int id)
     {
@@ -43,9 +49,15 @@ public class DoorOpenRequestController : Controller
 
 
     [HttpPost] // POST api/opendoorrequests
-    public Task Insert(OpenDoorRequest openDoorRequest)
+    public Task InsertNewOpenDoorRequest(OpenDoorRequest openDoorRequest)
     {
         return _dataAccess.InsertOpenDoorRequestAsync(openDoorRequest);
+    }
+
+    [HttpPost("newaccess")] // POST api/opendoorrequests/newaccess
+    public Task InsertNewAccess(Access access)
+    {
+        return _dataAccess.InsertNewAccessAsync(access);
     }
 
     [HttpPut("{id}")] // PUT api/opendoorrequests/{id}
