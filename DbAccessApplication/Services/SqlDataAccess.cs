@@ -24,7 +24,6 @@ public class SqlDataAccess : IDataAccess
                 ,[Gateways].[DeviceId]
                 ,[OpenDoorRequests].[DeviceGeneratedCode]
                 ,[OpenDoorRequests].[CloudGeneratedCode]
-                ,[OpenDoorRequests].[CodeInsertedOnDoorByUser]
                 ,[OpenDoorRequests].[AccessRequestTime]
                 ,[OpenDoorRequests].[UserId]
             FROM [dbo].[OpenDoorRequests]
@@ -66,7 +65,6 @@ public class SqlDataAccess : IDataAccess
                 ,[Gateways].[DeviceId]
                 ,[OpenDoorRequests].[DeviceGeneratedCode]
                 ,[OpenDoorRequests].[CloudGeneratedCode]
-                ,[OpenDoorRequests].[CodeInsertedOnDoorByUser]
                 ,[OpenDoorRequests].[AccessRequestTime]
                 ,[OpenDoorRequests].[UserId]
             FROM [dbo].[OpenDoorRequests]
@@ -89,7 +87,6 @@ public class SqlDataAccess : IDataAccess
                 ,[Gateways].[DeviceId]
                 ,[OpenDoorRequests].[DeviceGeneratedCode]
                 ,[OpenDoorRequests].[CloudGeneratedCode]
-                ,[OpenDoorRequests].[CodeInsertedOnDoorByUser]
                 ,[OpenDoorRequests].[AccessRequestTime]
                 ,[OpenDoorRequests].[UserId]
             FROM [dbo].[OpenDoorRequests]
@@ -184,7 +181,6 @@ public class SqlDataAccess : IDataAccess
                 [GatewayId] = [Gateways].[Id],
                 [DeviceGeneratedCode] = @DeviceGeneratedCode,
                 [CloudGeneratedCode] = @CloudGeneratedCode,
-                [CodeInsertedOnDoorByUser] = @CodeInsertedOnDoorByUser,
                 [AccessRequestTime] = @AccessRequestTime,
                 [UserId] = @UserId
             FROM [dbo].[OpenDoorRequests]
@@ -221,7 +217,6 @@ public class SqlDataAccess : IDataAccess
     public async Task DeleteOpenDoorRequestsAsync(int minutes)
     {
         DateTime minutesAgo = DateTime.Now.AddMinutes(-minutes);
-        Console.WriteLine("Effettivamente qui la cancellazione avviene");
 
 
         const string query = @"
